@@ -1,59 +1,359 @@
-**We're making these examples compatible to v3. If you find something strange, feel free to send PR :smile:**
+# TypeScript Express GraphQL API
 
-[![Build Status][travis-image]][travis-url] [![MIT License][license-image]][license-url]
+A Monolithic Modular Backend API using TypeScript, Express.js, and GraphQL (Apollo Server Express) that serves 2 types of users: admin and user.
 
-# Riot Examples
+## Technology Stack
 
-This is a series of examples designed to showcase the benefits of adopting [Riot](http://riotjs.com). It is made possible by the Riot open source community.
+- **Language**: TypeScript
+- **Framework**: Express.js
+- **GraphQL**: Apollo Server Express
+- **Database**: MongoDB (via mongoose)
+- **Authentication**: JWT + bcrypt
+- **Role-based access**: user & admin
+- **Input validation**: class-validator
+- **Config**: dotenv
+- **Logging**: pino
+- **Tools**: ts-node-dev, eslint, prettier, concurrently
 
-**Note**: These examples are basically tested on the latest version of Riot. [Check the older examples here](https://github.com/riot/examples/tree/v2.6.x) for v2.
+## Features
 
-We have several examples to choose from; each one demonstrates different aspects Riot:
+- **User Features**:
+  - Register and login
+  - View available vegetable products
+  - View product details
+  - Create orders
+  - View order history
 
-## Basics
+- **Admin Features**:
+  - Login with admin credentials
+  - Manage products (CRUD operations)
+  - View all orders
+  - View all users
 
-Example | | |
-:-- | :-- | :--
-Timer | [Source](timer) | [Demo](http://riotjs.com/examples/plunker/?app=timer)
-Todo | [Source](todo-app) | [Demo](http://riotjs.com/examples/plunker/?app=todo-app)
-Todo (pre-compiled) | [Source](todo-app-precompiled) | [Demo](http://riotjs.com/examples/todo-app-precompiled/)
-Live filtering | [Source](live-filtering) | [Demo](http://riotjs.com/examples/plunker/?app=live-filtering)
-Mixins | [Source](mixins) | [Demo](http://riotjs.com/examples/plunker/?app=mixins)
-Observables | [Source](observables) | [Demo](http://riotjs.com/examples/plunker/?app=observables)
-Router - Page switcher | [Source](router-page-switcher) | [Demo](http://riotjs.com/examples/plunker/?app=router-page-switcher)
-Animated list reordering | [Source](animated-list-reordering) | [Demo](http://riotjs.com/examples/plunker/?app=animated-list-reordering)
-Live Ajax Search | [Source](live-ajax-search) | [Demo](http://riotjs.com/examples/plunker/?app=live-ajax-search)
+## Project Structure
 
-## Advanced
+```
+src/
+├── index.ts                 // App entry point
+├── server.ts                // Express + Apollo setup
+├── config/
+│   ├── env.ts
+│   └── database.ts
+├── middleware/
+│   ├── auth.ts              // JWT verification
+│   └── errorHandler.ts      // Global error handling
+├── schema/
+│   └── modules/
+│       ├── user/            // Module for buyers
+│       ├── admin/           // Module for admin
+│       └── shared/          // Shared models & logic
+├── utils/
+│   ├── logger.ts
+│   └── seed.ts
+├── constants/
+└── types/
+```
 
-Example | | |
-:-- | :-- | :--
-ES6 | [Source](es6) | [Demo](http://riotjs.com/examples/plunker/?app=es6)
-Pre-process LESS | [Source](pre-process-less) | [Demo](http://riotjs.com/examples/plunker/?app=pre-process-less)
-Router - Complex | [Source](router-complex) | [Demo](http://riotjs.com/examples/plunker/?app=router-complex)
-Router - History API | [Source](router-history-api) |
-Webpack | [Source](webpack) |
-Rollup | [Source](rollup) |
-Redux | [Source](redux) |
-GraphQL | [Source](graphql) |
+## Getting Started
 
-## Extra
+### Prerequisites
 
-Example | | |
-:-- | :-- | :--
-If, then, elseif | [Source](if-else-elseif) | [Demo](http://riotjs.com/examples/plunker/?app=if-else-elseif)
+- Node.js (v14 or higher)
+- MongoDB (local or Atlas)
 
-## Contribute
+### Installation
 
-If you have an example that you think others could benefit from and you'd like to share it please read the [contributing guidelines](CONTRIBUTING.md) and submit a PR.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/ts-express-graphql-api.git
+   cd ts-express-graphql-api
+   ```
 
-## Bugs
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-If you find something that isn't expected please [raise an issue](https://github.com/riot/examples/issues) and we'll get on it. To make it easier to debug please use the [Bug Reporter](http://riotjs.com/examples/plunker/?app=bug-reporter).
+3. Create a `.env` file based on `.env.example`:
+   ```bash
+   cp .env.example .env
+   ```
 
+4. Update the `.env` file with your configuration.
 
-[travis-image]:https://img.shields.io/travis/riot/examples.svg?style=flat-square
-[travis-url]:https://travis-ci.org/riot/examples
+### Running the Application
 
-[license-image]:http://img.shields.io/badge/license-MIT-000000.svg?style=flat-square
-[license-url]:LICENSE
+#### Development Mode
+
+```bash
+npm run dev
+```
+
+This will start the server with hot-reloading using ts-node-dev.
+
+#### Production Mode
+
+```bash
+npm run build
+npm start
+```
+
+### Docker
+
+To run the application using Docker:
+
+```bash
+# Build the Docker image
+npm run docker:build
+
+# Run the Docker container
+npm run docker:run
+```
+
+## API Endpoints
+
+The GraphQL API is available at:
+
+```
+http://localhost:4000/graphql
+```
+
+### GraphQL Operations
+
+#### Authentication
+
+- **Register User**:
+  ```graphql
+  mutation {
+    registerUser(input: {
+      name: "John Doe",
+      email: "john@example.com",
+      password: "Password@123"
+    }) {
+      token
+      user {
+        id
+        name
+        email
+        role
+      }
+    }
+  }
+  ```
+
+- **Login User**:
+  ```graphql
+  mutation {
+    loginUser(input: {
+      email: "john@example.com",
+      password: "Password@123"
+    }) {
+      token
+      user {
+        id
+        name
+        email
+        role
+      }
+    }
+  }
+  ```
+
+- **Login Admin**:
+  ```graphql
+  mutation {
+    loginAdmin(input: {
+      email: "admin@example.com",
+      password: "Admin@123"
+    }) {
+      token
+      user {
+        id
+        name
+        email
+        role
+      }
+    }
+  }
+  ```
+
+#### User Operations
+
+- **Get Available Products**:
+  ```graphql
+  query {
+    getAvailableProducts {
+      id
+      name
+      description
+      price
+      stock
+      imageUrl
+    }
+  }
+  ```
+
+- **Get Product by ID**:
+  ```graphql
+  query {
+    getProductById(id: "productId") {
+      id
+      name
+      description
+      price
+      stock
+      imageUrl
+    }
+  }
+  ```
+
+- **Create Order**:
+  ```graphql
+  mutation {
+    createOrder(input: {
+      productIds: ["productId1", "productId2"],
+      shippingAddress: "123 Main St, City, Country"
+    }) {
+      id
+      totalAmount
+      status
+      products {
+        id
+        name
+      }
+    }
+  }
+  ```
+
+- **Get My Orders**:
+  ```graphql
+  query {
+    getMyOrders {
+      id
+      totalAmount
+      status
+      products {
+        id
+        name
+      }
+      createdAt
+    }
+  }
+  ```
+
+#### Admin Operations
+
+- **Get All Products**:
+  ```graphql
+  query {
+    getAllProducts {
+      id
+      name
+      description
+      price
+      stock
+      imageUrl
+    }
+  }
+  ```
+
+- **Create Product**:
+  ```graphql
+  mutation {
+    createProduct(input: {
+      name: "Organic Carrot",
+      description: "Fresh organic carrots",
+      price: 2.99,
+      stock: 100,
+      imageUrl: "https://example.com/carrot.jpg"
+    }) {
+      id
+      name
+      description
+      price
+      stock
+      imageUrl
+    }
+  }
+  ```
+
+- **Update Product**:
+  ```graphql
+  mutation {
+    updateProduct(
+      id: "productId",
+      input: {
+        name: "Organic Carrot",
+        description: "Fresh organic carrots",
+        price: 3.49,
+        stock: 150,
+        imageUrl: "https://example.com/carrot.jpg"
+      }
+    ) {
+      id
+      name
+      description
+      price
+      stock
+      imageUrl
+    }
+  }
+  ```
+
+- **Delete Product**:
+  ```graphql
+  mutation {
+    deleteProduct(id: "productId")
+  }
+  ```
+
+- **Get All Orders**:
+  ```graphql
+  query {
+    getAllOrders {
+      id
+      user {
+        id
+        name
+        email
+      }
+      products {
+        id
+        name
+      }
+      totalAmount
+      status
+      createdAt
+    }
+  }
+  ```
+
+- **Get All Users**:
+  ```graphql
+  query {
+    getAllUsers {
+      id
+      name
+      email
+      role
+      createdAt
+    }
+  }
+  ```
+
+## Authentication
+
+The API uses JWT for authentication. To access protected endpoints, include the JWT token in the Authorization header:
+
+```
+Authorization: Bearer <your_token>
+```
+
+## Error Handling
+
+The API provides detailed error messages for validation errors and other issues. In production mode, internal server errors are masked for security reasons.
+
+## License
+
+This project is licensed under the ISC License.
+
